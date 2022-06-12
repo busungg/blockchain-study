@@ -5,6 +5,8 @@ import "./safemath.sol";
 
 contract ZombieFactory is Ownable {
     using SafeMath for uint256;
+    using SafeMath32 for uint32;
+    using SafeMath16 for uint16;
 
     uint dnaDigits = 16;
     uint dnaModulus = 10 ** dnaDigits;
@@ -27,7 +29,7 @@ contract ZombieFactory is Ownable {
     function _createZombie (string _name, uint _dna) internal {
         uint id = zombies.push(Zombie(_name, _dna, 1, uint32(now + cooldownTime), 0, 0)) - 1;
         zombieToOwner[id] = msg.sender;
-        ownerZombieCount[msg.sender]++;
+        ownerZombieCount[msg.sender] = ownerZombieCount[msg.sender].add(1);
         NewZombie(id, _name, _dna);
     }
 
@@ -44,20 +46,11 @@ contract ZombieFactory is Ownable {
 }
 
 /**
+과제:
 
-1. Zombie 구조체가 2개의 속성을 더 가지도록 수정하게:
+우리가 SafeMath32를 uint32에 쓴다는 것을 선언하게.
 
-    a. winCount, uint16 타입
+우리가 SafeMath16을 uint16에 쓴다는 것을 선언하게.
 
-    b. lossCount, 역시 uint16 타입
-
-참고: 기억하게, 구조체 안에서 uint들을 압축(pack)할 수 있으니, 
-우리가 다룰 수 있는 가장 작은 uint 타입을 사용하는 것이 좋을 것이네. uint8은 너무 작을 것이네. 2^8 = 256이기 때문이지 - 
-만약 우리 좀비가 하루에 한 번씩 공격한다면, 일 년 안에 데이터 크기가 넘쳐버릴 수 있을 것이네. 하지만 2^16은 65536이네 - 
-그러니 한 사용자가 매일 179년 동안 이기거나 지지 않는다면, 이걸로 안전할 것이네.
-
-2. 이제 우리는 Zombie 구조체에 새로운 속성들을 가지게 되었으니, _createZombie()의 함수 정의 부분을 수정해야 할 필요가 있네.
-
-3. 각각의 새로운 좀비가 0승 0패를 가지고 생성될 수 있도록 좀비 생성의 정의 부분을 변경하게.
-
+ZombieFactory에 SafeMath 메소드를 사용해야 할 곳이 한 줄 더 있네. 어딘지 가리키는 주석을 남겨놓았네.
  */
